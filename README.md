@@ -1,111 +1,104 @@
-<a href="https://livekit.io/">
-  <img src="./.github/assets/livekit-mark.png" alt="LiveKit logo" width="100" height="100">
-</a>
+# LiveKit Agent Deployment on Modal
 
-# LiveKit Agents Starter - Python
+This directory contains a LiveKit voice AI agent that can be deployed on [Modal](https://modal.com/), a serverless platform for running Python applications. The agent provides a voice AI assistant with speech-to-text, text-to-speech, and large language model capabilities.
 
-A complete starter project for building voice AI apps with [LiveKit Agents for Python](https://github.com/livekit/agents).
+## Getting Started
 
-The starter project includes:
+Before deploying, ensure you have:
 
-- A simple voice AI assistant based on the [Voice AI quickstart](https://docs.livekit.io/agents/start/voice-ai/)
-- Voice AI pipeline based on [OpenAI](https://docs.livekit.io/agents/integrations/llm/openai/), [Cartesia](https://docs.livekit.io/agents/integrations/tts/cartesia/), and [Deepgram](https://docs.livekit.io/agents/integrations/llm/deepgram/)
-  - Easily integrate your preferred [LLM](https://docs.livekit.io/agents/integrations/llm/), [STT](https://docs.livekit.io/agents/integrations/stt/), and [TTS](https://docs.livekit.io/agents/integrations/tts/) instead, or swap to a realtime model like the [OpenAI Realtime API](https://docs.livekit.io/agents/integrations/realtime/openai)
-- Eval suite based on the LiveKit Agents [testing & evaluation framework](https://docs.livekit.io/agents/build/testing/)
-- [LiveKit Turn Detector](https://docs.livekit.io/agents/build/turns/turn-detector/) for contextually-aware speaker detection, with multilingual support
-- [LiveKit Cloud enhanced noise cancellation](https://docs.livekit.io/home/cloud/noise-cancellation/)
-- Integrated [metrics and logging](https://docs.livekit.io/agents/build/metrics/)
+- **Modal Account**: Sign up at [modal.com](https://modal.com/)
+- **LiveKit Account**: Set up a LiveKit Cloud account or self-hosted instance
+- **API Keys**: This example uses the following services which will require API keys:
+   - OpenAI API
+   - Deepgram API
+   - Cartesia API
 
-This starter app is compatible with any [custom web/mobile frontend](https://docs.livekit.io/agents/start/frontend/) or [SIP-based telephony](https://docs.livekit.io/agents/start/telephony/).
+### Install Dependencies
 
-## Dev Setup
+The project uses `uv` for dependency management. That said, the only local dependency you need is `modal`. The rest of the configuration in `pyproject.toml` is based on the LiveKit Python starter project.
 
-Clone the repository and install dependencies to a virtual environment:
-
-```console
-cd agent-starter-python
+```bash
 uv sync
 ```
 
-Set up the environment by copying `.env.example` to `.env.local` and filling in the required values:
-
-- `LIVEKIT_URL`: Use [LiveKit Cloud](https://cloud.livekit.io/) or [run your own](https://docs.livekit.io/home/self-hosting/)
-- `LIVEKIT_API_KEY`
-- `LIVEKIT_API_SECRET`
-- `OPENAI_API_KEY`: [Get a key](https://platform.openai.com/api-keys) or use your [preferred LLM provider](https://docs.livekit.io/agents/integrations/llm/)
-- `DEEPGRAM_API_KEY`: [Get a key](https://console.deepgram.com/) or use your [preferred STT provider](https://docs.livekit.io/agents/integrations/stt/)
-- `CARTESIA_API_KEY`: [Get a key](https://play.cartesia.ai/keys) or use your [preferred TTS provider](https://docs.livekit.io/agents/integrations/tts/)
-
-You can load the LiveKit environment automatically using the [LiveKit CLI](https://docs.livekit.io/home/cli/cli-setup):
+### Authenticate Modal
 
 ```bash
-lk app env -w .env.local
+modal setup
 ```
 
-## Run the agent
+### Set Up Secrets on Modal
 
-Before your first run, you must download certain models such as [Silero VAD](https://docs.livekit.io/agents/build/turns/vad/) and the [LiveKit turn detector](https://docs.livekit.io/agents/build/turns/turn-detector/):
+**Using the Modal dashboard**
 
-```console
-uv run python src/agent.py download-files
+Navigate to the Secrets section in the Modal dashboard and add the following secrets:
+
+- `LIVEKIT_URL` - Your LiveKit WebRTC server URL
+- `LIVEKIT_API_KEY` - API key for authenticating LiveKit requests
+- `LIVEKIT_API_SECRET` - API secret for LiveKit authentication
+- `OPENAI_API_KEY` - API key for OpenAI's GPT-based processing
+- `CARTESIA_API_KEY` - API key for Cartesia's TTS services
+- `DEEPGRAM_API_KEY` - API key for Deepgram's STT services
+
+You can find your LiveKit URL and API keys under **Settings** > **Project** and **Settings** > **Keys** in the LiveKit dashboard.
+
+![Modal Secrets](https://modal-cdn.com/cdnbot/modal-livekit-secretsndip6awa_78ed94b0.webp)
+
+**Using the Modal CLI:**
+
+```bash
+modal secret create livekit-voice-agent \
+  --env LIVEKIT_URL=your_livekit_url \
+  --env LIVEKIT_API_KEY=your_api_key \
+  --env LIVEKIT_API_SECRET=your_api_secret \
+  --env OPENAI_API_KEY=your_openai_key \
+  --env DEEPGRAM_API_KEY=your_deepgram_key \
+  --env CARTESIA_API_KEY=your_cartesia_key
 ```
 
-Next, run this command to speak to your agent directly in your terminal:
+Once added, you can reference these secrets in your Modal functions.
 
-```console
-uv run python src/agent.py console
+### Configure LiveKit Webhooks
+
+In your LiveKit project dashboard, create a new Webhook using the URL created when you deploy your Modal app. This URL will be printed to stdout and is also available in your Modal dashboard. It will look something like the URL in the screenshot below:
+
+![settings webhooks](https://modal-cdn.com/cdnbot/livekit-webhooksiceyins6_203427cc.webp)
+
+## Deployment
+
+Run the following command to deploy your Modal app. 
+```bash
+modal deploy -m src.server
+```
+You can interact with your agent using the hosted [LiveKit Agent Playground](https://docs.livekit.io/agents/start/playground/). When you connect to the room, the `room_started` webhook event will spawn your agent to the room.
+
+## Developing
+
+During development in case be helpful to launch the application using
+```
+modal serve -m src.server
+```
+which will reload the app when changes are made to the source code.
+
+## Testing
+
+### Test the Agent
+
+Use the following command to launch your app remotely and execute the tests using `pytest`:
+```
+modal run -m src.server
 ```
 
-To run the agent for use with a frontend or telephony, use the `dev` command:
+### Test the Webhook Endpoint
 
-```console
-uv run python src/agent.py dev
+Test the webhook endpoint with a sample LiveKit event from the command line:
+
+```bash
+curl -X POST {MODAL_AGENT_WEB_ENDPOINT_URL} \
+  -H "Authorization: Bearer your_livekit_token" \
+  -H "Content-Type: application/json" \
+  -d '{"event": "room_started", "room": {"name": "test-room"}}'
 ```
 
-In production, use the `start` command:
+Or you can trigger Webhook events from LiveKit Webhooks setting page (the same place you created the new Webhook).
 
-```console
-uv run python src/agent.py start
-```
-
-## Frontend & Telephony
-
-Get started quickly with our pre-built frontend starter apps, or add telephony support:
-
-| Platform | Link | Description |
-|----------|----------|-------------|
-| **Web** | [`livekit-examples/agent-starter-react`](https://github.com/livekit-examples/agent-starter-react) | Web voice AI assistant with React & Next.js |
-| **iOS/macOS** | [`livekit-examples/agent-starter-swift`](https://github.com/livekit-examples/agent-starter-swift) | Native iOS, macOS, and visionOS voice AI assistant |
-| **Flutter** | [`livekit-examples/agent-starter-flutter`](https://github.com/livekit-examples/agent-starter-flutter) | Cross-platform voice AI assistant app |
-| **React Native** | [`livekit-examples/voice-assistant-react-native`](https://github.com/livekit-examples/voice-assistant-react-native) | Native mobile app with React Native & Expo |
-| **Android** | [`livekit-examples/agent-starter-android`](https://github.com/livekit-examples/agent-starter-android) | Native Android app with Kotlin & Jetpack Compose |
-| **Web Embed** | [`livekit-examples/agent-starter-embed`](https://github.com/livekit-examples/agent-starter-embed) | Voice AI widget for any website |
-| **Telephony** | [📚 Documentation](https://docs.livekit.io/agents/start/telephony/) | Add inbound or outbound calling to your agent |
-
-For advanced customization, see the [complete frontend guide](https://docs.livekit.io/agents/start/frontend/).
-
-## Tests and evals
-
-This project includes a complete suite of evals, based on the LiveKit Agents [testing & evaluation framework](https://docs.livekit.io/agents/build/testing/). To run them, use `pytest`.
-
-```console
-uv run pytest
-```
-
-## Using this template repo for your own project
-
-Once you've started your own project based on this repo, you should:
-
-1. **Check in your `uv.lock`**: This file is currently untracked for the template, but you should commit it to your repository for reproducible builds and proper configuration management. (The same applies to `livekit.toml`, if you run your agents in LiveKit Cloud)
-
-2. **Remove the git tracking test**: Delete the "Check files not tracked in git" step from `.github/workflows/tests.yml` since you'll now want this file to be tracked. These are just there for development purposes in the template repo itself.
-
-3. **Add your own repository secrets**: You must [add secrets](https://docs.github.com/en/actions/how-tos/writing-workflows/choosing-what-your-workflow-does/using-secrets-in-github-actions) for `OPENAI_API_KEY` or your other LLM provider so that the tests can run in CI.
-
-## Deploying to production
-
-This project is production-ready and includes a working `Dockerfile`. To deploy it to LiveKit Cloud or another environment, see the [deploying to production](https://docs.livekit.io/agents/ops/deployment/) guide.
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
