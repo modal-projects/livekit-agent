@@ -2,7 +2,7 @@ import pytest
 from livekit.agents import AgentSession, llm, mock_tools
 from livekit.plugins import openai
 
-from agent import Assistant
+from src.agent import Assistant
 
 
 def _llm() -> llm.LLM:
