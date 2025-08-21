@@ -1,22 +1,16 @@
 # LiveKit Agent Deployment on Modal
 
 This directory contains a [LiveKit](https://livekit.com) voice AI agent that can be deployed on [Modal](https://modal.com/), a serverless platform for running Python applications. The agent provides a voice AI assistant with speech-to-text, text-to-speech, and large language model capabilities.
-
-**This deployment example relies on the following paid API services:**
-- [OpenAI](https://openai.com)
-- [Cartesia](https://cartesia.com)
-- [Deepgram](https://deepgram.com)
-
 ## Getting Started
 
 Before deploying, ensure you have:
 
-- **Modal Account**: Sign up at [modal.com](https://modal.com/)
-- **LiveKit Account**: Set up a LiveKit Cloud account or self-hosted instance
-- **API Keys**: This example uses the following services which will require API keys:
-   - OpenAI API
-   - Deepgram API
-   - Cartesia API
+- **Modal Account**: Sign up at [modal.com](https://modal.com/) and get $30/month of free compute.
+- **LiveKit Account**: Set up a [LiveKit](https://livekit.com) account
+- **API Keys**:
+    - [OpenAI](https://openai.com)
+    - [Cartesia](https://cartesia.com)
+    - [Deepgram](https://deepgram.com)
 
 ### Install Dependencies
 
