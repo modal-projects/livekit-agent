@@ -1,4 +1,4 @@
-# LiveKit Agent Deployment on Modal
+# Modal LiveKit Agents Deployment Example
 
 This directory contains a [LiveKit](https://livekit.com) voice AI agent that can be deployed on [Modal](https://modal.com/), a serverless platform for running Python applications. The agent provides a voice AI assistant with speech-to-text, text-to-speech, and large language model capabilities.
 ## Getting Started
