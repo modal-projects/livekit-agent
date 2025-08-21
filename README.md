@@ -1,6 +1,7 @@
 # Modal LiveKit Agents Deployment Example
 
-This directory contains a [LiveKit](https://livekit.com) voice AI agent that can be deployed on [Modal](https://modal.com/), a serverless platform for running Python applications. The agent provides a voice AI assistant with speech-to-text, text-to-speech, and large language model capabilities.
+This directory contains a [LiveKit](https://livekit.com) voice AI agent deployed on [Modal](https://modal.com/), a serverless platform for running Python applications. The agent is based on [LiveKit's `agent-starter-python` project](https://github.com/livekit-examples/agent-starter-python)
+
 ## Getting Started
 
 Before deploying, ensure you have:
@@ -14,7 +15,7 @@ Before deploying, ensure you have:
 
 ### Install Dependencies
 
-The project uses `uv` for dependency management. That said, the only local dependency you need is `modal`. The rest of the configuration in `pyproject.toml` is based on the LiveKit Python starter project.
+The project uses `uv` for dependency management. That said, the only local dependency you need is `modal`. To setup the environment, run
 
 ```bash
 uv sync
